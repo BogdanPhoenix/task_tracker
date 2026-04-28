@@ -55,11 +55,14 @@ class Task:
 
     @classmethod
     def convert_from_dict(cls, obj: dict[str, str]) -> Task:
-        return Task(
-            id=int(obj["id"]),
-            description=obj["description"],
-            status=TaskStatus(obj["status"]),
-            created_at=datetime.fromisoformat(obj["createdAt"]),
-            updated_at=datetime.fromisoformat(obj["updatedAt"])
-        )
+        try:
+            return Task(
+                id=int(obj["id"]),
+                description=obj["description"],
+                status=TaskStatus(obj["status"]),
+                created_at=datetime.fromisoformat(obj["createdAt"]),
+                updated_at=datetime.fromisoformat(obj["updatedAt"])
+            )
+        except (KeyError, ValueError, TypeError):
+            return None
 

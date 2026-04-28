@@ -31,6 +31,13 @@ def test_convert_from_dict():
     assert current.updated_at is not None
 
 
+def test_invalid_convert_from_dict():
+    invalid_dict = {"id": 1, "description": "ok"}
+    current = Task.convert_from_dict(invalid_dict)
+
+    assert current is None
+
+
 def test_change_description():
     mock_past = mock_now - timedelta(hours=1)
     new_description = "New text"
