@@ -1,0 +1,16 @@
+from abc import ABC, abstractmethod
+from src.models.task import Task
+
+
+class ITaskRepository(ABC):
+    @abstractmethod
+    def get_all(self) -> list[Task]:
+        pass
+
+    @abstractmethod
+    def save_all(self, tasks: list[Task]) -> None:
+        pass
+
+    @abstractmethod
+    def get_by_id(self, id: int) -> Task:
+        pass
