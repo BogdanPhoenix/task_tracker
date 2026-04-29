@@ -11,7 +11,7 @@ class TaskStatus(Enum):
 
 @dataclass
 class Task:
-    id: int
+    id: int = 0
     description: str = ""
     status: TaskStatus = TaskStatus.TODO
     created_at: datetime = None
@@ -42,9 +42,9 @@ class Task:
         self.updated_at = datetime.now()
 
 
-    def convert_to_dict(self) -> dict[str, str]:
+    def convert_to_dict(self) -> dict:
         buffer = {
-            "id": str(self.id),
+            "id": self.id,
             "description": self.description,
             "status": self.status.value,
             "createdAt": self.created_at.isoformat(),
@@ -54,10 +54,10 @@ class Task:
         return buffer
 
     @classmethod
-    def convert_from_dict(cls, obj: dict[str, str]) -> Task:
+    def convert_from_dict(cls, obj: dict) -> Task:
         try:
             return Task(
-                id=int(obj["id"]),
+                id=obj["id"],
                 description=obj["description"],
                 status=TaskStatus(obj["status"]),
                 created_at=datetime.fromisoformat(obj["createdAt"]),

@@ -3,7 +3,7 @@ from datetime import datetime, timedelta
 from src.models.task import Task, TaskStatus
 
 mock_now = datetime.now()
-mock_dict = {"id": "1", "description": "Test", "status": "todo", "createdAt": mock_now.isoformat(), "updatedAt": mock_now.isoformat()}
+mock_dict = {"id": 1, "description": "Test", "status": "todo", "createdAt": mock_now.isoformat(), "updatedAt": mock_now.isoformat()}
 
 def test_correct_init():
     current = Task(1)
@@ -84,7 +84,7 @@ def test_large_id():
     large_id = 999_999_999_999
     obj = Task(id=large_id)
     assert obj.id == large_id
-    assert obj.convert_to_dict()["id"] == str(large_id)
+    assert obj.convert_to_dict()["id"] == large_id
 
 
 def test_id_as_string_in_init():

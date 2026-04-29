@@ -30,7 +30,7 @@ class JsonTaskRepository(ITaskRepository):
 
     def add(self, task: Task) -> Task:
         data = self._read_raw_data()
-        new_id = max((int(t["id"]) for t in data), default=0) + 1
+        new_id = max((t["id"] for t in data), default=0) + 1
 
         task_with_id = replace(task, id=new_id)
         data.append(task_with_id.convert_to_dict())
@@ -77,7 +77,7 @@ class JsonTaskRepository(ITaskRepository):
         data = self._read_raw_data()
 
         for element in data:
-            if int(element["id"]) == id:
+            if element["id"] == id:
                 return Task.convert_from_dict(element)
 
         raise ValueError(f"Task with id = {id} not found")
@@ -88,7 +88,7 @@ class JsonTaskRepository(ITaskRepository):
 
         target_index = -1
         for i, element in enumerate(all_elements):
-            if int(element["id"]) == id:
+            if element["id"] == id:
                 target_index = i
                 break
 
