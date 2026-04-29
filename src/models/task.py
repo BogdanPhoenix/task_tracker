@@ -66,3 +66,9 @@ class Task:
         except (KeyError, ValueError, TypeError):
             return None
 
+    @property
+    def status_formatted(self) -> str:
+        return self.status.value.upper().replace("-", " ")
+
+    def __repr__(self) -> str:
+        return f"Task(id={self.id}, status='{self.status.value}')"
