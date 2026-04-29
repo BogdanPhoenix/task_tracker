@@ -22,6 +22,11 @@ class TaskService:
         return self.repository.get_all()
 
 
+    def get_tasks_by_status(self, status: TaskStatus) -> list[Task]:
+        tasks = self.get_all_tasks()
+        return [ task for task in tasks if task.status == status ]
+
+
     def get_task_by_id(self, id: int) -> Task:
         return self.repository.get_by_id(id)
 

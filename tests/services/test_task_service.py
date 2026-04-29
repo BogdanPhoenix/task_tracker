@@ -1,10 +1,8 @@
-from functools import wraps
-
 import pytest
 
 from unittest.mock import patch
 
-from src.models.task import Task, TaskStatus
+from src.models.task import TaskStatus
 from src.storage.json_storage import JsonTaskRepository
 from src.services.task_service import TaskService
 
@@ -95,6 +93,38 @@ def test_delete_sequential_tasks(temp_service, temp_storage):
     remaining = temp_storage.get_all()
     assert len(remaining) == 1
     assert remaining[0].description == "T2"
+
+
+def test_get_tasks_by_status(temp_service):
+    temp_service.add_task("First")
+    temp_service.add_task("Second")
+    third = temp_service.add_task("Third")
+
+    temp_service.update_task_status(third.id, TaskStatus.IN_PROGRESS)
+
+    tasks = temp_service.get_tasks_by_status(TaskStatus.TODO)
+
+    assert len(tasks) == 2
+    assert all(t.status == TaskStatus.TODO for t in tasks)
+
+
+def test_get_tasks_by_status_returns_empty_if_none_match(temp_service):
+    temp_service.add_task("T1")
+
+    results = temp_service.get_tasks_by_status(TaskStatus.IN_PROGRESS)
+    assert results == []
+
+
+def test_get_tasks_by_status_empty_storage(temp_service):
+    results = temp_service.get_tasks_by_status(TaskStatus.TODO)
+    assert results == []
+
+
+def test_get_tasks_by_status_with_invalid_type(temp_service):
+    temp_service.add_task("First")
+
+    results = temp_service.get_tasks_by_status("todo")
+    assert results == []
 
 
 def test_get_all_correctly(temp_service):
