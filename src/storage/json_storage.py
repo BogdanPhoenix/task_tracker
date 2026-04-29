@@ -106,3 +106,16 @@ class JsonTaskRepository(ITaskRepository):
             self._save_json([])
         except Exception as e:
             raise Exception(f"Unable to delete the contents of the file ‘{self.file_path}’.") from e
+
+
+    def update(self, new_task: Task) -> Task:
+        all_elements = self._read_raw_data()
+
+        for i, element in enumerate(all_elements):
+            if element["id"] == new_task.id:
+                all_elements[i] = new_task.convert_to_dict()
+
+                self._save_json(all_elements)
+                return new_task
+
+        raise ValueError(f"Task with id = {new_task.id} not found")

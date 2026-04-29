@@ -26,3 +26,7 @@ class ITaskRepository(ABC):
     @abstractmethod
     def delete_all(self) -> None:
         pass
+
+    @abstractmethod
+    def update(self, new_task: Task) -> Task:
+        pass

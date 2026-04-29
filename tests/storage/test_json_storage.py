@@ -1,7 +1,7 @@
 import os
 import pytest
 from unittest.mock import patch
-from src.models.task import Task
+from src.models.task import Task, TaskStatus
 from src.storage.json_storage import JsonTaskRepository
 
 
@@ -148,3 +148,43 @@ def test_delete_all_raises_exception_on_failure(temp_storage):
     with patch.object(temp_storage, '_save_json', side_effect=Exception("System failure")):
         with pytest.raises(Exception, match="Unable to delete the contents of the file"):
             temp_storage.delete_all()
+
+
+def test_update_correctly(temp_storage):
+    expected = Task(id=1, description="Test", status=TaskStatus.IN_PROGRESS)
+    new_task = Task(id=1, description="Test", status=TaskStatus.IN_PROGRESS)
+
+    temp_storage.add(Task(description="Test"))
+    updated = temp_storage.update(new_task)
+
+    assert updated == expected
+
+
+def test_update_raises_error_if_id_not_found(temp_storage):
+    new_task = Task(id=999, description="Test Update", status=TaskStatus.DONE)
+
+    with pytest.raises(ValueError, match="Task with id = 999 not found"):
+        temp_storage.update(new_task)
+
+
+def test_update_preserves_other_fields(temp_storage):
+    task = temp_storage.add(Task(description="Initial"))
+    original_created_at = task.created_at
+
+    task.description = "Updated"
+    updated = temp_storage.update(task)
+
+    assert updated.description == "Updated"
+    assert updated.status == TaskStatus.TODO
+    assert updated.created_at == original_created_at
+
+
+def test_update_atomic_failure_protection(temp_storage):
+    task = temp_storage.add(Task(description="Safe"))
+    task.description = "Danger"
+
+    with patch("os.replace", side_effect=OSError("Disk Full")):
+        with pytest.raises(Exception, match="Failed to save data"):
+            temp_storage.update(task)
+
+    assert temp_storage.get_by_id(task.id).description == "Safe"
