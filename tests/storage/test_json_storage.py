@@ -11,6 +11,32 @@ def temp_storage(tmp_path):
     return JsonTaskRepository(str(file_path))
 
 
+def test_add_task_to_empty_storage(temp_storage):
+    new_task = Task(id=0, description="First")
+    saved_task = temp_storage.add(new_task)
+
+    assert saved_task.id == 1
+    assert len(temp_storage.get_all()) == 1
+
+
+def test_add_task_increments_id_correctly(temp_storage):
+    temp_storage.add(Task(id=0, description="Task 1"))
+    second_task = temp_storage.add(Task(id=0, description="Task 2"))
+
+    assert second_task.id == 2
+    assert temp_storage.get_all()[1].description == "Task 2"
+
+
+def test_add_task_persists_data(temp_storage):
+    from datetime import datetime
+    task = Task(id=0, description="Persistent Task")
+    temp_storage.add(task)
+
+    loaded_tasks = temp_storage.get_all()
+    assert loaded_tasks[0].description == "Persistent Task"
+    assert isinstance(loaded_tasks[0].created_at, datetime)
+
+
 def test_get_all_returns_empty_list_when_file_not_found(temp_storage):
     assert temp_storage.get_all() == []
 

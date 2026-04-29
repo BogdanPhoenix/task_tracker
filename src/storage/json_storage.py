@@ -1,6 +1,7 @@
 import json
 import os.path
 
+from dataclasses import replace
 from src.models.task import Task
 from src.storage.repository import ITaskRepository
 
@@ -25,6 +26,17 @@ class JsonTaskRepository(ITaskRepository):
             return [item for item in data if isinstance(item, dict)]
         except json.JSONDecodeError:
             return []
+
+
+    def add(self, task: Task) -> Task:
+        data = self._read_raw_data()
+        new_id = max((int(t["id"]) for t in data), default=0) + 1
+
+        task_with_id = replace(task, id=new_id)
+        data.append(task_with_id.convert_to_dict())
+        self._save_json(data)
+
+        return task_with_id
 
 
     def get_all(self) -> list[Task]:

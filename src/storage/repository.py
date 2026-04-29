@@ -4,6 +4,10 @@ from src.models.task import Task
 
 class ITaskRepository(ABC):
     @abstractmethod
+    def add(self, task: Task) -> Task:
+        pass
+
+    @abstractmethod
     def get_all(self) -> list[Task]:
         pass
 
