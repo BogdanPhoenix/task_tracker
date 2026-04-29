@@ -73,3 +73,52 @@ def test_get_all_skips_invalid_task_records(temp_storage):
     tasks = temp_storage.get_all()
     assert len(tasks) == 0
 
+
+def test_delete_by_id_success(temp_storage):
+    tasks = [
+        Task(id=1, description="First"),
+        Task(id=2, description="Second"),
+        Task(id=3, description="Third")
+    ]
+    temp_storage.save_all(tasks)
+
+    removed_task = temp_storage.delete_by_id(2)
+
+    assert removed_task.id == 2
+    assert removed_task.description == "Second"
+
+    remaining_tasks = temp_storage.get_all()
+    assert len(remaining_tasks) == 2
+    assert all(t.id != 2 for t in remaining_tasks)
+
+
+def test_delete_by_id_raises_value_error_if_not_found(temp_storage):
+    temp_storage.save_all([Task(id=1, description="Test")])
+
+    with pytest.raises(ValueError, match="Task with id = 999 not found"):
+        temp_storage.delete_by_id(999)
+
+
+def test_delete_by_id_with_empty_storage(temp_storage):
+    with pytest.raises(ValueError, match="Task with id = 1 not found"):
+        temp_storage.delete_by_id(1)
+
+
+def test_delete_all_removes_all_tasks(temp_storage):
+    tasks = [Task(id=1, description="Task 1"), Task(id=2, description="Task 2")]
+    temp_storage.save_all(tasks)
+    assert len(temp_storage.get_all()) == 2
+
+    temp_storage.delete_all()
+    assert temp_storage.get_all() == []
+
+
+def test_delete_all_works_if_file_not_exists(temp_storage):
+    temp_storage.delete_all()
+    assert temp_storage.get_all() == []
+
+
+def test_delete_all_raises_exception_on_failure(temp_storage):
+    with patch.object(temp_storage, '_save_json', side_effect=Exception("System failure")):
+        with pytest.raises(Exception, match="Unable to delete the contents of the file"):
+            temp_storage.delete_all()

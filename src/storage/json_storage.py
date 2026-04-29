@@ -41,9 +41,8 @@ class JsonTaskRepository(ITaskRepository):
         return tasks
 
 
-    def save_all(self, tasks: list[Task]) -> None:
-        data = [ task.convert_to_dict() for task in tasks ]
-        json_str = json.dumps(data, indent=4)
+    def _save_json(self, json_data: list[dict]) -> None:
+        json_str = json.dumps(json_data, indent=4)
 
         with open(self.temp_file_path, "w") as json_file:
             json_file.write(json_str)
@@ -57,6 +56,11 @@ class JsonTaskRepository(ITaskRepository):
             raise Exception("Failed to save data") from e
 
 
+    def save_all(self, tasks: list[Task]) -> None:
+        json_data = [ task.convert_to_dict() for task in tasks ]
+        self._save_json(json_data)
+
+
     def get_by_id(self, id: int) -> Task:
         data = self._read_raw_data()
 
@@ -66,4 +70,27 @@ class JsonTaskRepository(ITaskRepository):
 
         raise ValueError(f"Task with id = {id} not found")
 
-    
+
+    def delete_by_id(self, id: int) -> Task:
+        all_elements = self._read_raw_data()
+
+        target_index = -1
+        for i, element in enumerate(all_elements):
+            if int(element["id"]) == id:
+                target_index = i
+                break
+
+        if target_index == -1:
+            raise ValueError(f"Task with id = {id} not found")
+
+        removed_data = all_elements.pop(target_index)
+        self._save_json(all_elements)
+
+        return Task.convert_from_dict(removed_data)
+
+
+    def delete_all(self) -> None:
+        try:
+            self._save_json([])
+        except Exception as e:
+            raise Exception(f"Unable to delete the contents of the file ‘{self.file_path}’.") from e

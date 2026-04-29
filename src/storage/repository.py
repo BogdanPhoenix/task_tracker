@@ -14,3 +14,11 @@ class ITaskRepository(ABC):
     @abstractmethod
     def get_by_id(self, id: int) -> Task:
         pass
+
+    @abstractmethod
+    def delete_by_id(self, id: int) -> Task:
+        pass
+
+    @abstractmethod
+    def delete_all(self) -> None:
+        pass
