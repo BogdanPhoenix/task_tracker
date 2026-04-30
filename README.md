@@ -1,5 +1,7 @@
 # Task Tracker CLI
 
+You can view the problem statement at the following [link](https://roadmap.sh/projects/task-tracker).
+
 A robust, modular, and professional Command-Line Interface (CLI) application for tracking tasks. Built with Python using a clean architecture (Service/Repository pattern) and atomic JSON persistence.
 
 ## Features
