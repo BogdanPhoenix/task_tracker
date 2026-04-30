@@ -4,6 +4,17 @@ from src.models.task import TaskStatus
 
 
 def build_parser() -> argparse.ArgumentParser:
+    """
+    Constructs and configures the command-line argument parser for the application.
+
+    This function initializes the main parser and defines the subcommands 
+    (add, update, delete, mark, list) along with their required and optional 
+    arguments based on the TaskStatus enumeration.
+
+    Returns:
+        argparse.ArgumentParser: A fully configured parser instance ready to process CLI input.
+    """
+
     list_status = [status.value for status in TaskStatus]
     mark_status = [value for value in list_status if value != TaskStatus.TODO.value]
 
@@ -36,5 +47,15 @@ def build_parser() -> argparse.ArgumentParser:
 
 
 def parser_args():
+    """
+    Initializes the command-line interface and parses provided arguments.
+
+    This function serves as a wrapper to build the parser and execute the 
+    parsing process, returning the structured results for application logic execution.
+
+    Returns:
+        argparse.Namespace: An object containing the parsed command-line arguments and associated function mappings.
+    """
+
     parser = build_parser()
     return parser.parse_args()
